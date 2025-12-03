@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.Scanner;
 
 public class Main {
 
@@ -31,7 +32,40 @@ public class Main {
             throw new RuntimeException(e);
         }
         //Todo: Starting point for your code
+
+        AccountRepository accountRepo = new AccountRepositoryImpl(jdbcUrl, dbUser, dbPass);
+        MoonMissionRepository moonMissionRepo = new MoonMissionRepositoryImpl(jdbcUrl, dbUser, dbPass);
+
+
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Username: ");
+        String user = scanner.nextLine();
+        System.out.println("Password: ");
+        String pass = scanner.nextLine();
+        if( user.isEmpty() || pass.isEmpty() ) {
+            System.out.println("Username or password cannot be empty.");
+        }
+
+        if (!accountRepo.findUsernames().contains(user) || !accountRepo.findPasswords().contains(pass)) {
+            System.out.println("Invalid username or password.");
+        }
+        String choice;
+        String menu = """
+                    1) List moon missions (prints spacecraft names from `moon_mission`).
+                    2) Get a moon mission by mission_id (prints details for that mission).
+                    3) Count missions for a given year (prompts: year; prints the number of missions launched that year).
+                    4) Create an account (prompts: first name, last name, ssn, password; prints confirmation).
+                    5) Update an account password (prompts: user_id, new password; prints confirmation).
+                    6) Delete an account (prompts: user_id; prints confirmation).
+                    0) Exit.
+                """;
+        System.out.println(menu);
+        choice = scanner.next();
+        if (choice.equalsIgnoreCase("1")) {
+            System.out.println(moonMissionRepo.listMoonMissions());
+        }
     }
+
 
     /**
      * Determines if the application is running in development mode based on system properties,

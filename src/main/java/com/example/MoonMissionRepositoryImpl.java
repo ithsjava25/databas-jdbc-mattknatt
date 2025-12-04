@@ -1,32 +1,28 @@
 package com.example;
 
+import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MoonMissionRepositoryImpl implements MoonMissionRepository {
+    private final DataSource dataSource;
     Connection connection;
-    PreparedStatement listMoonMissionsStmt,
-            getMoonMissionByIdStmt,
-            missionCountByYearStmt;
 
-    public MoonMissionRepositoryImpl(String jdbc, String username, String password) {
-        try {
-            connection = DriverManager.getConnection(jdbc, username, password);
-            listMoonMissionsStmt = connection.prepareStatement("select * from moon_mission");
-            getMoonMissionByIdStmt = connection.prepareStatement("select * from moon_mission where mission_id = ?");
-            missionCountByYearStmt = connection.prepareStatement("select count(*) as mission_count from moon_mission where year(launch_date) = ?");
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-
+    public MoonMissionRepositoryImpl(DataSource dataSource) {
+        this.dataSource = dataSource;
     }
+
 
     @Override
     public List<String> listMoonMissions() {
+        String sql = "select * from moon_mission";
         List<String> moonMissions = new ArrayList<>();
         try {
-            ResultSet rs = listMoonMissionsStmt.executeQuery();
+            connection = dataSource.getConnection();
+            PreparedStatement ps = connection.prepareStatement(sql);
+
+            ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 moonMissions.add(rs.getString("spacecraft"));
             }
@@ -38,9 +34,12 @@ public class MoonMissionRepositoryImpl implements MoonMissionRepository {
     @Override
     public List<MoonMission> getMoonMissionById(String id) {
         List<MoonMission> moonMissions = new ArrayList<>();
+        String sql = "select * from moon_mission where mission_id = ?";
         try {
-            getMoonMissionByIdStmt.setString(1,id);
-            ResultSet rs = getMoonMissionByIdStmt.executeQuery();
+            connection = dataSource.getConnection();
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1,id);
+            ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                MoonMission m = new MoonMission(
                        rs.getInt("mission_id"),
@@ -62,9 +61,12 @@ public class MoonMissionRepositoryImpl implements MoonMissionRepository {
     @Override
     public int missionsCountByYear(int year) {
         int count= 0;
+        String sql = "select count(*) as mission_count from moon_mission where year(launch_date) = ?";
         try {
-            missionCountByYearStmt.setInt(1, year);
-            ResultSet rs = missionCountByYearStmt.executeQuery();
+            connection = dataSource.getConnection();
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setInt(1, year);
+            ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 count = rs.getInt("mission_count");
             }

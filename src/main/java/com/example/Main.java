@@ -1,9 +1,8 @@
 package com.example;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import javax.sql.DataSource;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.Scanner;
 
 public class Main {
@@ -27,30 +26,137 @@ public class Main {
                             "as system properties (-Dkey=value) or environment variables.");
         }
 
-        try (Connection connection = DriverManager.getConnection(jdbcUrl, dbUser, dbPass)) {
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
         //Todo: Starting point for your code
 
-        AccountRepository accountRepo = new AccountRepositoryImpl(jdbcUrl, dbUser, dbPass);
-        MoonMissionRepository moonMissionRepo = new MoonMissionRepositoryImpl(jdbcUrl, dbUser, dbPass);
-
+        DataSource dataSource = new SimpleDriverManagerDataSource(jdbcUrl, dbUser, dbPass);
+        AccountRepository accountRepo = new AccountRepositoryImpl(dataSource);
+        MoonMissionRepository moonMissionRepo = new MoonMissionRepositoryImpl(dataSource);
 
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Username: ");
-        String user = scanner.nextLine();
-        System.out.println("Password: ");
-        String pass = scanner.nextLine();
-        if (user.isEmpty() || pass.isEmpty()) {
-            System.out.println("Username or password cannot be empty.");
+
+        Optional<Account> currentUser = login(accountRepo, scanner);
+
+        while (currentUser.isEmpty()) {
+            currentUser = login(accountRepo, scanner);
         }
 
-        if (!accountRepo.findUsernames().contains(user) || !accountRepo.findPasswords().contains(pass)) {
-            System.out.println("Invalid username or password.");
-            return;
+        boolean running = true;
+
+        while (running) {
+            showMenu();
+            String choice = scanner.nextLine();
+            if (!choice.isEmpty()) {
+                switch (choice) {
+                    case "1" -> showMissions(moonMissionRepo);
+                    case "2" -> getMissionById(scanner, moonMissionRepo);
+                    case "3" -> countMissionsForYear(scanner, moonMissionRepo);
+                    case "4" -> createAccount(scanner, accountRepo);
+                    case "5" -> updatePasswordById(scanner, accountRepo);
+                    case "6" -> deleteAccountById(scanner, accountRepo);
+                    case "0" -> {
+                        System.out.println("Exiting...");
+                        running = false;
+                    }
+                    default -> System.out.println("Invalid choice.");
+                }
+            } else {
+                System.out.println("Choice cannot be empty.");
+            }
+
         }
-        String choice;
+
+        scanner.close();
+    }
+
+    private Optional<Account> login(AccountRepository accountRepo, Scanner sc) {
+        System.out.println("Username: ");
+        String user = sc.nextLine().trim();
+        System.out.println("Password: ");
+        String pass = sc.nextLine().trim();
+        if (user.isEmpty() || pass.isEmpty()) {
+            System.out.println("Username or password cannot be empty.");
+            return Optional.empty();
+        }
+
+        Optional<Account> maybeAccount = accountRepo.findByUsername(user);
+        if (maybeAccount.isPresent()) {
+            Account account = maybeAccount.get();
+            if (account.getPassword().equals(pass)) {
+                return Optional.of(account);
+            } else {
+                System.out.println("Invalid username or password.");
+                return Optional.empty();
+            }
+        } else {
+            System.out.println("Invalid username or password.");
+            return Optional.empty();
+        }
+
+    }
+
+    private static void deleteAccountById(Scanner sc, AccountRepository accountRepo) {
+        System.out.println("Enter the user_id for the account you want to delete: ");
+        int userId = Integer.parseInt(sc.nextLine().trim());
+        if(accountRepo.deleteAccount(userId))
+            System.out.println("Account successfully deleted.");
+        else
+            System.out.println("Account could not be deleted.");
+    }
+
+    private static void updatePasswordById(Scanner sc, AccountRepository accountRepo) {
+        System.out.println("Enter a user_id to update the password for: ");
+        int userId = Integer.parseInt(sc.nextLine().trim());
+        System.out.println("Enter new password:");
+        String newPassword = sc.nextLine().trim();
+        while (newPassword.isEmpty()) {
+            System.out.println("Password cannot be empty.");
+            System.out.println("Enter new password:");
+            newPassword = sc.nextLine().trim();
+        }
+        if(accountRepo.updatePassword(userId, newPassword))
+            System.out.println("Password successfully updated.");
+        else
+            System.out.println("Password could not be updated.");
+    }
+
+    private static void createAccount(Scanner sc, AccountRepository accountRepo) {
+        String name, firstName, lastName, password, ssn;
+        System.out.println("Type in you username: ");
+        name = sc.nextLine().trim();
+        System.out.println("Type in your first name: ");
+        firstName = sc.nextLine().trim();
+        System.out.println("Type in your last name: ");
+        lastName = sc.nextLine().trim();
+        System.out.println("Type in your password: ");
+        password = sc.nextLine().trim();
+        System.out.println("Type in your ssn: ");
+        ssn = sc.nextLine().trim();
+        Account newAccount = new Account(name, password, firstName, lastName, ssn);
+        if (accountRepo.createAccount(newAccount)) {
+            System.out.println("Account successfully created.");
+        } else {
+            System.out.println("Account could not be created.");
+        }
+    }
+
+    private static void countMissionsForYear(Scanner sc, MoonMissionRepository moonMissionRepo) {
+        System.out.println("Enter a year for which you want number of missions listed: ");
+        int year = Integer.parseInt(sc.nextLine().trim());
+        System.out.println("In " + year + "there were " + moonMissionRepo.missionsCountByYear(year) + "missions.");
+    }
+
+    private static void getMissionById(Scanner sc, MoonMissionRepository moonMissionRepo) {
+        System.out.println("Provide a mission_id to get information: ");
+        String id = sc.nextLine().trim();
+        System.out.println(moonMissionRepo.getMoonMissionById(id).toString());
+    }
+
+    private static void showMissions(MoonMissionRepository moonMissionRepo) {
+        System.out.println(moonMissionRepo.listMoonMissions());
+    }
+
+    private static void showMenu() {
+        System.out.println("Options: ");
         String menu = """
                     1) List moon missions (prints spacecraft names from `moon_mission`).
                     2) Get a moon mission by mission_id (prints details for that mission).
@@ -61,65 +167,7 @@ public class Main {
                     0) Exit.
                 """;
         System.out.println(menu);
-        choice = scanner.next();
-
-        switch (choice) {
-            case "1" -> System.out.println(moonMissionRepo.listMoonMissions());
-            case "2" -> {
-                System.out.println("Provide a mission_id to get information: ");
-                String id = scanner.next();
-                System.out.println(moonMissionRepo.getMoonMissionById(id).toString());
-            }
-            case "3" -> {
-                System.out.println("Enter a year for which you want number of missions listed: ");
-                int year = scanner.nextInt();
-                System.out.println("In " + year + "there were " + moonMissionRepo.missionsCountByYear(year) + "missions.");
-            }
-            case "4" -> {
-                String name, firstName, lastName, password, ssn;
-                System.out.println("Type in you username: ");
-                name = scanner.next();
-                System.out.println("Type in your first name: ");
-                firstName = scanner.next();
-                System.out.println("Type in your last name: ");
-                lastName = scanner.next();
-                System.out.println("Type in your password: ");
-                password = scanner.next();
-                System.out.println("Type in your ssn: ");
-                ssn = scanner.next();
-                Account newAccount = new Account(name, password, firstName, lastName, ssn);
-                if (accountRepo.createAccount(newAccount)) {
-                    System.out.println("Account successfully created.");
-                    System.out.println(accountRepo.countAccounts());
-                } else {
-                    System.out.println("Account could not be created.");
-                }
-            }
-            case "5" -> {
-                System.out.println("Enter a user_id to update the password for: ");
-                int userId = scanner.nextInt();
-                System.out.println("Enter new password:");
-                String newPassword = scanner.next();
-                while (newPassword.isEmpty()) {
-                    System.out.println("Password cannot be empty.");
-                    System.out.println("Enter new password:");
-                    newPassword = scanner.next();
-                }
-                if(accountRepo.updatePassword(userId, newPassword))
-                    System.out.println("Password successfully updated.");
-                else
-                    System.out.println("Password could not be updated.");
-            }
-            case "6" -> {
-                System.out.println("Enter the user_id for the account you want to delete: ");
-                int userId = scanner.nextInt();
-                if(accountRepo.deleteAccount(userId))
-                    System.out.println("Account successfully deleted.");
-                else
-                    System.out.println("Account could not be deleted.");
-
-            }
-        }
+        System.out.println("Enter your option (0-6): ");
     }
 
 

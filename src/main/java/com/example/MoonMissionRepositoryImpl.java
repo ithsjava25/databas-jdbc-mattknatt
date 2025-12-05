@@ -19,7 +19,7 @@ public class MoonMissionRepositoryImpl implements MoonMissionRepository {
         List<String> moonMissions = new ArrayList<>();
         try (Connection connection = dataSource.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()){
+             ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 moonMissions.add(rs.getString("spacecraft"));
             }
@@ -28,13 +28,14 @@ public class MoonMissionRepositoryImpl implements MoonMissionRepository {
         }
         return moonMissions;
     }
+
     @Override
     public List<MoonMission> getMoonMissionById(String id) {
         List<MoonMission> moonMissions = new ArrayList<>();
         String sql = "select * from moon_mission where mission_id = ?";
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)){
-            ps.setString(1,id);
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     MoonMission m = new MoonMission(
@@ -66,9 +67,9 @@ public class MoonMissionRepositoryImpl implements MoonMissionRepository {
                     count = rs.getInt("mission_count");
                 }
             }
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-            return count;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
+        return count;
+    }
 }

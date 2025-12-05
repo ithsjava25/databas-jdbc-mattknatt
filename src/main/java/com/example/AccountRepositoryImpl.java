@@ -18,9 +18,9 @@ public class AccountRepositoryImpl implements AccountRepository {
     public List<String> findUsernames() {
         List<String> usernames = new ArrayList<>();
         String sql = "select * from account";
-        try(Connection connection = dataSource.getConnection();
-        PreparedStatement ps = connection.prepareStatement(sql);
-        ResultSet rs = ps.executeQuery()) {
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 usernames.add(rs.getString("name"));
             }
@@ -34,7 +34,7 @@ public class AccountRepositoryImpl implements AccountRepository {
     public Optional<Account> findByUsername(String username) {
         String sql = "select * from account where name = ?";
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)){
+             PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, username);
             try (ResultSet rs = ps.executeQuery()) {
 
@@ -62,7 +62,7 @@ public class AccountRepositoryImpl implements AccountRepository {
         String sql = "select * from account";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery() ){
+             ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 Account a = new Account(
                         rs.getInt("user_id"),
@@ -84,7 +84,7 @@ public class AccountRepositoryImpl implements AccountRepository {
     public boolean createAccount(Account account) {
         String sql = "insert into account(name, password, first_name, last_name, ssn) values (?, ?, ?, ?, ?)";
         try (Connection connection = dataSource.getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql)){
+             PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, account.getName());
             ps.setString(2, account.getPassword());
             ps.setString(3, account.getFirst_name());
@@ -102,7 +102,7 @@ public class AccountRepositoryImpl implements AccountRepository {
     public boolean updatePassword(int id, String password) {
         String sql = "update account set password=? where user_id=?";
         try (Connection connection = dataSource.getConnection();
-            PreparedStatement ps = connection.prepareStatement(sql)) {
+             PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, password);
             ps.setInt(2, id);
 
@@ -116,7 +116,7 @@ public class AccountRepositoryImpl implements AccountRepository {
     public boolean deleteAccount(int id) {
         String sql = "delete from account where user_id=?";
         try (Connection connection = dataSource.getConnection();
-            PreparedStatement ps = connection.prepareStatement(sql)){
+             PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, id);
 
             return ps.executeUpdate() > 0;

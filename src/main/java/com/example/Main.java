@@ -40,7 +40,7 @@ public class Main {
         showMenu();
         String choice;
         do {
-            if(!scanner.hasNextLine()) break;
+            if (!scanner.hasNextLine()) break;
             choice = scanner.nextLine();
             if (!choice.isEmpty()) {
                 switch (choice) {
@@ -56,10 +56,10 @@ public class Main {
                 if (!choice.equals("0")) {
                     showMenu();
                 }
-                } else{
-            System.out.println("Choice cannot be empty.");
-        }
-    } while (!choice.equals("0"));
+            } else {
+                System.out.println("Choice cannot be empty.");
+            }
+        } while (!choice.equals("0"));
 
 //        scanner.close();
     }
@@ -75,7 +75,7 @@ public class Main {
                 return true;
             } else if (answer.equals("1")) {
                 currentUser = login(accountRepo, scanner);
-            }else
+            } else
                 System.out.println("Invalid choice.");
         }
         return false;
@@ -92,7 +92,7 @@ public class Main {
         }
 
         Optional<Account> maybeAccount = accountRepo.findByUsername(user);
-        if(maybeAccount.isEmpty() || !pass.equals(maybeAccount.get().getPassword())) {
+        if (maybeAccount.isEmpty() || !pass.equals(maybeAccount.get().getPassword())) {
             System.out.println("Invalid username or password.");
             return Optional.empty();
         }
@@ -104,11 +104,11 @@ public class Main {
         int userId;
         try {
             userId = Integer.parseInt(sc.nextLine());
-        }  catch (NumberFormatException e) {
+        } catch (NumberFormatException e) {
             System.out.println("Invalid user_id format.");
             return;
         }
-        if(accountRepo.deleteAccount(userId))
+        if (accountRepo.deleteAccount(userId))
             System.out.println("Account successfully deleted.");
         else
             System.out.println("Account could not be deleted.");
@@ -130,7 +130,7 @@ public class Main {
             System.out.println("Enter new password:");
             newPassword = sc.nextLine().trim();
         }
-        if(accountRepo.updatePassword(userId, newPassword))
+        if (accountRepo.updatePassword(userId, newPassword))
             System.out.println("Password successfully updated.");
         else
             System.out.println("Password could not be updated.");
@@ -172,7 +172,7 @@ public class Main {
         System.out.println("Provide a mission_id to get information: ");
         String id = sc.nextLine().trim();
         List<MoonMission> missions = moonMissionRepo.getMoonMissionById(id);
-        if(missions.isEmpty())
+        if (missions.isEmpty())
             System.out.println("Mission not found.");
         else
             System.out.println(missions);

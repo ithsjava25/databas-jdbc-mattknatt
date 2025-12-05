@@ -7,7 +7,6 @@ import java.util.List;
 
 public class MoonMissionRepositoryImpl implements MoonMissionRepository {
     private final DataSource dataSource;
-    Connection connection;
 
     public MoonMissionRepositoryImpl(DataSource dataSource) {
         this.dataSource = dataSource;
@@ -18,11 +17,9 @@ public class MoonMissionRepositoryImpl implements MoonMissionRepository {
     public List<String> listMoonMissions() {
         String sql = "select * from moon_mission";
         List<String> moonMissions = new ArrayList<>();
-        try {
-            connection = dataSource.getConnection();
-            PreparedStatement ps = connection.prepareStatement(sql);
-
-            ResultSet rs = ps.executeQuery();
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()){
             while (rs.next()) {
                 moonMissions.add(rs.getString("spacecraft"));
             }
@@ -35,44 +32,43 @@ public class MoonMissionRepositoryImpl implements MoonMissionRepository {
     public List<MoonMission> getMoonMissionById(String id) {
         List<MoonMission> moonMissions = new ArrayList<>();
         String sql = "select * from moon_mission where mission_id = ?";
-        try {
-            connection = dataSource.getConnection();
-            PreparedStatement ps = connection.prepareStatement(sql);
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)){
             ps.setString(1,id);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-               MoonMission m = new MoonMission(
-                       rs.getInt("mission_id"),
-                       rs.getString("spacecraft"),
-                       rs.getDate("launch_date"),
-                       rs.getString("carrier_rocket"),
-                       rs.getString("operator"),
-                       rs.getString("mission_type"),
-                       rs.getString("outcome"));
-               moonMissions.add(m);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    MoonMission m = new MoonMission(
+                            rs.getInt("mission_id"),
+                            rs.getString("spacecraft"),
+                            rs.getDate("launch_date"),
+                            rs.getString("carrier_rocket"),
+                            rs.getString("operator"),
+                            rs.getString("mission_type"),
+                            rs.getString("outcome"));
+                    moonMissions.add(m);
+                }
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
         return moonMissions;
-
     }
 
     @Override
     public int missionsCountByYear(int year) {
-        int count= 0;
+        int count = 0;
         String sql = "select count(*) as mission_count from moon_mission where year(launch_date) = ?";
-        try {
-            connection = dataSource.getConnection();
-            PreparedStatement ps = connection.prepareStatement(sql);
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, year);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                count = rs.getInt("mission_count");
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    count = rs.getInt("mission_count");
+                }
             }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+            return count;
         }
-        return count;
-    }
 }

@@ -8,7 +8,6 @@ import java.util.Optional;
 
 public class AccountRepositoryImpl implements AccountRepository {
     private final DataSource dataSource;
-    Connection connection;
 
     public AccountRepositoryImpl(DataSource dataSource) {
         this.dataSource = dataSource;
@@ -19,10 +18,9 @@ public class AccountRepositoryImpl implements AccountRepository {
     public List<String> findUsernames() {
         List<String> usernames = new ArrayList<>();
         String sql = "select * from account";
-        try {
-            connection = dataSource.getConnection();
-            PreparedStatement ps = connection.prepareStatement(sql);
-            ResultSet rs = ps.executeQuery();
+        try(Connection connection = dataSource.getConnection();
+        PreparedStatement ps = connection.prepareStatement(sql);
+        ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 usernames.add(rs.getString("name"));
             }
@@ -33,42 +31,26 @@ public class AccountRepositoryImpl implements AccountRepository {
     }
 
     @Override
-    public List<String> findPasswords() {
-        List<String> passwords = new ArrayList<>();
-        String sql = "select * from account";
-        try {
-            connection = dataSource.getConnection();
-            PreparedStatement ps = connection.prepareStatement(sql);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                passwords.add(rs.getString("password"));
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return passwords;
-    }
-
-    @Override
     public Optional<Account> findByUsername(String username) {
         String sql = "select * from account where name = ?";
-        try {
-            connection = dataSource.getConnection();
-            PreparedStatement ps = connection.prepareStatement(sql);
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)){
             ps.setString(1, username);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                Account account = new Account(
-                        rs.getInt("user_id"),
-                        rs.getString("name"),
-                        rs.getString("password"),
-                        rs.getString("first_name"),
-                        rs.getString("last_name"),
-                        rs.getString("ssn")
-                );
-                return Optional.of(account);
+            try (ResultSet rs = ps.executeQuery()) {
+
+                if (rs.next()) {
+                    Account account = new Account(
+                            rs.getInt("user_id"),
+                            rs.getString("name"),
+                            rs.getString("password"),
+                            rs.getString("first_name"),
+                            rs.getString("last_name"),
+                            rs.getString("ssn")
+                    );
+                    return Optional.of(account);
+                }
             }
-            else return Optional.empty();
+            return Optional.empty();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -78,10 +60,9 @@ public class AccountRepositoryImpl implements AccountRepository {
     public List<Account> findAccounts() {
         List<Account> accounts = new ArrayList<>();
         String sql = "select * from account";
-        try {
-            connection = dataSource.getConnection();
-            PreparedStatement ps = connection.prepareStatement(sql);
-            ResultSet rs = ps.executeQuery();
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery() ){
             while (rs.next()) {
                 Account a = new Account(
                         rs.getInt("user_id"),
@@ -102,75 +83,46 @@ public class AccountRepositoryImpl implements AccountRepository {
     @Override
     public boolean createAccount(Account account) {
         String sql = "insert into account(name, password, first_name, last_name, ssn) values (?, ?, ?, ?, ?)";
-        try {
-            connection = dataSource.getConnection();
-            PreparedStatement ps = connection.prepareStatement(sql);
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)){
             ps.setString(1, account.getName());
             ps.setString(2, account.getPassword());
             ps.setString(3, account.getFirst_name());
             ps.setString(4, account.getLast_name());
             ps.setString(5, account.getSsn());
-            if  (ps.executeUpdate() == 1) {
-                return true;
-            }
 
+            return ps.executeUpdate() == 1;
 
         } catch (SQLException e) {
             return false;
         }
-        return false;
     }
 
-    @Override
-    public int countAccounts() {
-        int count = 0;
-        try {
-            connection = dataSource.getConnection();
-            PreparedStatement ps = connection.prepareStatement("select count(*) from account");
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                count = rs.getInt(1);
-            }
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-        return count;
-    }
     @Override
     public boolean updatePassword(int id, String password) {
         String sql = "update account set password=? where user_id=?";
-        try {
-            connection = dataSource.getConnection();
-            PreparedStatement ps = connection.prepareStatement(sql);
+        try (Connection connection = dataSource.getConnection();
+            PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, password);
             ps.setInt(2, id);
-            int rowsAffected = ps.executeUpdate();
 
-            if  (rowsAffected > 0) {
-                return true;
-            }
-
+            return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             return false;
         }
-        return false;
     }
 
     @Override
     public boolean deleteAccount(int id) {
         String sql = "delete from account where user_id=?";
-        try {
-            connection = dataSource.getConnection();
-            PreparedStatement ps = connection.prepareStatement(sql);
+        try (Connection connection = dataSource.getConnection();
+            PreparedStatement ps = connection.prepareStatement(sql)){
             ps.setInt(1, id);
-            int rowsAffected = ps.executeUpdate();
-            if  (rowsAffected > 0) {
-                return true;
-            }
+
+            return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             return false;
         }
-        return false;
     }
 
 }

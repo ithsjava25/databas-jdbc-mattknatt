@@ -74,10 +74,9 @@ public class Account {
         return "Account{" +
                 "user_id=" + user_id +
                 ", name='" + name + '\'' +
-                ", password='" + password + '\'' +
                 ", first_name='" + first_name + '\'' +
                 ", last_name='" + last_name + '\'' +
-                ", ssn='" + ssn + '\'' +
-                '}';
+                ", ssn='***'" +
+                               '}';
     }
 }

@@ -38,7 +38,9 @@ public class Main {
         if (validateLogin(accountRepo, scanner)) return;
 
         showMenu();
-            String choice = scanner.nextLine();
+        String choice;
+        do {
+            choice = scanner.nextLine();
             if (!choice.isEmpty()) {
                 switch (choice) {
                     case "1" -> showMissions(moonMissionRepo);
@@ -50,9 +52,13 @@ public class Main {
                     case "0" -> System.out.println("Exiting...");
                     default -> System.out.println("Invalid choice.");
                 }
-            } else {
-                System.out.println("Choice cannot be empty.");
-            }
+                if (!choice.equals("0")) {
+                    showMenu();
+                }
+                } else{
+            System.out.println("Choice cannot be empty.");
+        }
+    } while (!choice.equals("0"));
 
 //        scanner.close();
     }
@@ -94,7 +100,13 @@ public class Main {
 
     private static void deleteAccountById(Scanner sc, AccountRepository accountRepo) {
         System.out.println("Enter the user_id for the account you want to delete: ");
-        int userId = Integer.parseInt(sc.nextLine().trim());
+        int userId;
+        try {
+            userId = Integer.parseInt(sc.nextLine());
+        }  catch (NumberFormatException e) {
+            System.out.println("Invalid user_id format.");
+            return;
+        }
         if(accountRepo.deleteAccount(userId))
             System.out.println("Account successfully deleted.");
         else
@@ -154,7 +166,7 @@ public class Main {
     }
 
     private static void showMissions(MoonMissionRepository moonMissionRepo) {
-        System.out.println(moonMissionRepo.listMoonMissions());
+        System.out.println(moonMissionRepo.listMoonMissions().toString());
     }
 
     private static void showMenu() {

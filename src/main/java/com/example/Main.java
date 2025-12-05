@@ -115,7 +115,13 @@ public class Main {
 
     private static void updatePasswordById(Scanner sc, AccountRepository accountRepo) {
         System.out.println("Enter a user_id to update the password for: ");
-        int userId = Integer.parseInt(sc.nextLine().trim());
+        int userId;
+        try {
+            userId = Integer.parseInt(sc.nextLine().trim());
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid user_id format.");
+            return;
+        }
         System.out.println("Enter new password:");
         String newPassword = sc.nextLine().trim();
         while (newPassword.isEmpty()) {
@@ -151,7 +157,13 @@ public class Main {
 
     private static void countMissionsForYear(Scanner sc, MoonMissionRepository moonMissionRepo) {
         System.out.println("Enter a year for which you want number of missions listed: ");
-        int year = Integer.parseInt(sc.nextLine().trim());
+        int year;
+        try {
+            year = Integer.parseInt(sc.nextLine().trim());
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid year format.");
+            return;
+        }
         System.out.println("In " + year + " there were " + moonMissionRepo.missionsCountByYear(year) + " missions.");
     }
 

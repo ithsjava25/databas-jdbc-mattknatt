@@ -40,6 +40,7 @@ public class Main {
         showMenu();
         String choice;
         do {
+            if(!scanner.hasNextLine()) break;
             choice = scanner.nextLine();
             if (!choice.isEmpty()) {
                 switch (choice) {

@@ -38,7 +38,7 @@ public class Main {
         if (validateLogin(accountRepo, scanner)) return;
 
         showMenu();
-        String choice;
+        String choice = "";
         do {
             if (!scanner.hasNextLine()) break;
             choice = scanner.nextLine().trim();
@@ -187,7 +187,7 @@ public class Main {
                     1) List moon missions (prints spacecraft names from `moon_mission`).
                     2) Get a moon mission by mission_id (prints details for that mission).
                     3) Count missions for a given year (prompts: year; prints the number of missions launched that year).
-                    4) Create an account (prompts: first name, last name, ssn, password; prints confirmation).
+                    4) Create an account (prompts: username, first name, last name, ssn, password; prints confirmation).
                     5) Update an account password (prompts: user_id, new password; prints confirmation).
                     6) Delete an account (prompts: user_id; prints confirmation).
                     0) Exit.

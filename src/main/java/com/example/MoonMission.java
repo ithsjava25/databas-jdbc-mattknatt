@@ -3,26 +3,26 @@ package com.example;
 import java.sql.Date;
 
 public class MoonMission {
-    private int mission_id;
-    private String spacecraft, carrier_rocket, operator, mission_type, outcome;
-    private Date launch_date;
+    private int missionId;
+    private String spacecraft, carrierRocket, operator, missionType, outcome;
+    private Date launchDate;
 
-    public MoonMission(int mission_id, String spacecraft, Date launch_date, String carrier_rocket, String operator, String mission_type, String outcome) {
-        this.mission_id = mission_id;
+    public MoonMission(int missionId, String spacecraft, Date launchDate, String carrierRocket, String operator, String missionType, String outcome) {
+        this.missionId = missionId;
         this.spacecraft = spacecraft;
-        this.carrier_rocket = carrier_rocket;
+        this.carrierRocket = carrierRocket;
         this.operator = operator;
-        this.mission_type = mission_type;
+        this.missionType = missionType;
         this.outcome = outcome;
-        this.launch_date = launch_date;
+        this.launchDate = launchDate;
     }
 
-    public int getMission_id() {
-        return mission_id;
+    public int getMissionId() {
+        return missionId;
     }
 
-    public void setMission_id(int mission_id) {
-        this.mission_id = mission_id;
+    public void setMissionId(int missionId) {
+        this.missionId = missionId;
     }
 
     public String getSpacecraft() {
@@ -33,12 +33,12 @@ public class MoonMission {
         this.spacecraft = spacecraft;
     }
 
-    public String getCarrier_rocket() {
-        return carrier_rocket;
+    public String getCarrierRocket() {
+        return carrierRocket;
     }
 
-    public void setCarrier_rocket(String carrier_rocket) {
-        this.carrier_rocket = carrier_rocket;
+    public void setCarrierRocket(String carrierRocket) {
+        this.carrierRocket = carrierRocket;
     }
 
     public String getOperator() {
@@ -49,12 +49,12 @@ public class MoonMission {
         this.operator = operator;
     }
 
-    public String getMission_type() {
-        return mission_type;
+    public String getMissionType() {
+        return missionType;
     }
 
-    public void setMission_type(String mission_type) {
-        this.mission_type = mission_type;
+    public void setMissionType(String missionType) {
+        this.missionType = missionType;
     }
 
     public String getOutcome() {
@@ -65,19 +65,19 @@ public class MoonMission {
         this.outcome = outcome;
     }
 
-    public Date getLaunch_date() {
-        return launch_date;
+    public Date getLaunchDate() {
+        return launchDate;
     }
 
-    public void setLaunch_date(Date launch_date) {
-        this.launch_date = launch_date;
+    public void setLaunchDate(Date launchDate) {
+        this.launchDate = launchDate;
     }
 
     @Override
     public String toString() {
         return String.format(
                 "ID: %s | Spacecraft: %s | Rocket: %s | Operator: %s | Type: %s | Outcome: %s | Launch date: %s",
-                mission_id, spacecraft, carrier_rocket, operator, mission_type, outcome, launch_date
+                missionId, spacecraft, carrierRocket, operator, missionType, outcome, launchDate
         );
     }
 }

@@ -1,32 +1,32 @@
 package com.example;
 
 public class Account {
-    private int user_id;
-    private String name, password, first_name, last_name, ssn;
+    private int userId;
+    private String name, password, firstName, lastName, ssn;
 
-    public Account(int user_id, String name, String password, String first_name, String last_name, String ssn) {
-        this.user_id = user_id;
+    public Account(int userId, String name, String password, String firstName, String lastName, String ssn) {
+        this.userId = userId;
         this.name = name;
         this.password = password;
-        this.first_name = first_name;
-        this.last_name = last_name;
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.ssn = ssn;
     }
 
-    public Account(String name, String password, String first_name, String last_name, String ssn) {
+    public Account(String name, String password, String firstName, String lastName, String ssn) {
         this.name = name;
         this.password = password;
-        this.first_name = first_name;
-        this.last_name = last_name;
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.ssn = ssn;
     }
 
-    public int getUser_id() {
-        return user_id;
+    public int getUserId() {
+        return userId;
     }
 
-    public void setUser_id(int user_id) {
-        this.user_id = user_id;
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
     public String getName() {
@@ -45,20 +45,20 @@ public class Account {
         this.password = password;
     }
 
-    public String getFirst_name() {
-        return first_name;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setFirst_name(String first_name) {
-        this.first_name = first_name;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 
-    public String getLast_name() {
-        return last_name;
+    public String getLastName() {
+        return lastName;
     }
 
-    public void setLast_name(String last_name) {
-        this.last_name = last_name;
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public String getSsn() {
@@ -72,10 +72,10 @@ public class Account {
     @Override
     public String toString() {
         return "Account{" +
-                "user_id=" + user_id +
+                "user_id=" + userId +
                 ", name='" + name + '\'' +
-                ", first_name='" + first_name + '\'' +
-                ", last_name='" + last_name + '\'' +
+                ", first_name='" + firstName + '\'' +
+                ", last_name='" + lastName + '\'' +
                 ", ssn='***'" +
                 '}';
     }

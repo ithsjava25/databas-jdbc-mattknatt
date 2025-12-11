@@ -17,7 +17,7 @@ public class AccountRepositoryImpl implements AccountRepository {
     @Override
     public List<String> findUsernames() {
         List<String> usernames = new ArrayList<>();
-        String sql = "select * from account";
+        String sql = "select name from account";
         try (Connection connection = dataSource.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -87,8 +87,8 @@ public class AccountRepositoryImpl implements AccountRepository {
              PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, account.getName());
             ps.setString(2, account.getPassword());
-            ps.setString(3, account.getFirst_name());
-            ps.setString(4, account.getLast_name());
+            ps.setString(3, account.getFirstName());
+            ps.setString(4, account.getLastName());
             ps.setString(5, account.getSsn());
 
             return ps.executeUpdate() == 1;

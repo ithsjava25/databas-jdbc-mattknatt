@@ -61,7 +61,6 @@ public class Main {
             }
         } while (!choice.equals("0"));
 
-//        scanner.close();
     }
 
     private boolean validateLogin(AccountRepository accountRepo, Scanner scanner) {

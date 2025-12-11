@@ -68,6 +68,11 @@ public class Main {
 
         while (currentUser.isEmpty()) {
             System.out.println("Enter 0 to exit or 1 to try again.");
+
+            if (!scanner.hasNextLine()) {
+                System.out.println("Input closed - exiting...");
+                return true;
+            }
             String answer = scanner.nextLine().trim();
             if (answer.equals("0")) {
                 System.out.println("Exiting...");
@@ -82,8 +87,19 @@ public class Main {
 
     private Optional<Account> login(AccountRepository accountRepo, Scanner sc) {
         System.out.println("Username: ");
+
+        if (!sc.hasNextLine()) {
+            System.out.println("Input closed - exiting...");
+            return Optional.empty();
+        }
         String user = sc.nextLine().trim();
         System.out.println("Password: ");
+
+        if (!sc.hasNextLine()) {
+            System.out.println("Input closed - exiting...");
+            return Optional.empty();
+        }
+
         String pass = sc.nextLine().trim();
         if (user.isEmpty() || pass.isEmpty()) {
             System.out.println("Username or password cannot be empty.");

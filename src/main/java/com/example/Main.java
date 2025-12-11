@@ -8,7 +8,7 @@ import java.util.Scanner;
 
 public class Main {
 
-    static void main(String[] args) {
+    public static void main(String[] args) {
         if (isDevMode(args)) {
             DevDatabaseInitializer.start();
         }
@@ -41,7 +41,7 @@ public class Main {
         String choice;
         do {
             if (!scanner.hasNextLine()) break;
-            choice = scanner.nextLine();
+            choice = scanner.nextLine().trim();
             if (!choice.isEmpty()) {
                 switch (choice) {
                     case "1" -> showMissions(moonMissionRepo);
@@ -102,7 +102,7 @@ public class Main {
         System.out.println("Enter the user_id for the account you want to delete: ");
         int userId;
         try {
-            userId = Integer.parseInt(sc.nextLine());
+            userId = Integer.parseInt(sc.nextLine().trim());
         } catch (NumberFormatException e) {
             System.out.println("Invalid user_id format.");
             return;
